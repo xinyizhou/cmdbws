@@ -61,7 +61,10 @@ def requests_error_handler(func):
 def validate_error_handler(func):
     @functools.wraps(func)
     def deco(*args, **kwargs):
-        cls, data, errors  = (args[0], args[1], [])
+        if len(args) < 3:
+            cls, data, errors  = (args[0], args[1], [])
+        else:
+            cls, data, errors  = (args[0], args[2], [])
         for key, value in data.items():
             attribute = [ a for a in cls.attributes if a["description"] == key ][0]
             attr_type = attribute["type"]
@@ -298,6 +301,7 @@ class CmdbClass(object):
         :param convert: 是否进行convert转换,默认为True
         :rtype: dict
         """
+        print 'xyz here',cid
         data = json.dumps(self.convert(data) if convert else data)
         return self.cmdb.request_real("PUT", join(self.url, 'cards', str(cid)), 
                 data=data)
